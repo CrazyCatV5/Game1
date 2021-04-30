@@ -440,10 +440,10 @@ function draw() {
             if(UP && shipY >0){
                 shipY -= shipSpeed;
             }
-            if(DOWN && shipY < canvas.height - shipH-20){
+            if(DOWN && shipY < canvas.height - shipH){
                 shipY += shipSpeed;
             }
-            if(RIGHT && shipX <canvas.width - shipW-20){
+            if(RIGHT && shipX <canvas.width - shipW){
                 shipX += shipSpeed;
             }
             if(LEFT && shipX > 0){
@@ -457,10 +457,10 @@ function draw() {
         }
         else {
             if (MOUSEDOWN){
-                if(clickY>0 && clickY < canvas.height - shipH-20){
+                if(clickY>0 +shipH/2&& clickY < canvas.height - shipH/2){
                     shipY = clickY - shipH/2;
                 }
-                if(clickX>0 && clickX < canvas.width - shipW-20){
+                if(clickX>0+shipH/2 && clickX < canvas.width - shipW/2){
                     shipX = clickX - shipW/2;
                 }
             }
