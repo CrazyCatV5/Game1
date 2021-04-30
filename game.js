@@ -19,6 +19,7 @@ var SPACE=false;
 var MOUSEDOWN=false;
 var time = 0;
 var bullets = [];
+var ebulets = [];
 var obstacles = [];
 var bosses = [];
 var menu = true;
@@ -49,6 +50,8 @@ document.addEventListener("touchmove", touchM, false);
 document.addEventListener("touchcancel", touchF, false);
 var back = new Image(); 
 back.src = 'images/mlechnyy-put-kosmos-zvezdy-3734.jpg';
+var elaser = new Image(); 
+elaser.src = 'images/elaser.png';
 var BossIm = new Image(); 
 BossIm.src = 'images/starshippixelart.png';
 var laser = new Image(); 
@@ -147,6 +150,29 @@ class Boss {
     }
     get healthget(){
         return this.healthes;
+    }
+    get Xget(){
+        return this.x;
+    }
+}
+class eBullet{
+    constructor(x, y, z){
+        this.px = x;
+        this.py = y;
+        this.way = z;
+    }
+    draw(){
+        ctx.beginPath();
+        ctx.drawImage(elaser, this.px, this.py, laserW, laserH);
+        ctx.closePath();
+        this.px -= BulletSpeed;
+    }
+    damag(){
+        if (shipX < this.px + laserW  && shipX + shipW  > this.px
+            && shipY < this.py + laserH && shipY + shipH > this.py && time > 50){
+                return true;
+            }
+        return false;
     }
 }
 class Bullet {
@@ -348,6 +374,9 @@ function draw() {
         }
         bosses.forEach((Boss, index) => {
             Boss.draw();
+            if(BossTime%30 == 0){
+                ebulets.push(new eBullet(Boss.Xget, Math.floor(Math.random() * canvas.height/4)+canvas.height/3, 1))
+            }
             if(Boss.healthget == 0){
                 bosses.splice(index,1); 
                 BossTime = 0;
@@ -372,6 +401,14 @@ function draw() {
                         bullets.splice(index, 1);
                     }
             })
+        });
+        ebulets.forEach((eBullet, index) => {
+            eBullet.draw()
+            if (eBullet.damag()){
+                Gamer.damag();
+                ebulets.splice(index,1);
+                time = 0;
+            }
         });
         obstacles.forEach((Obstacle, index) => {
             if(Obstacle.damag()){
@@ -446,7 +483,7 @@ function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawRestart();
     }
-    if (Gamer.live == 0){
+    if (Gamer.live <= 0){
         restart = true;
         Gamer.reset();
         shipH = 788/5;
