@@ -36,6 +36,9 @@ document.addEventListener("keyup",keyUpHandler, false);
 document.addEventListener("mousedown", mouseDown, false);
 document.addEventListener("mouseup", mouseUp, false);
 document.addEventListener("mousemove", mousemove, false);
+document.addEventListener("touchstart", touchS, false);
+document.addEventListener("touchmove", touchM, false);
+document.addEventListener("touchcancel", touchF, false);
 var back = new Image(); 
 back.src = 'images/mlechnyy-put-kosmos-zvezdy-3734.jpg';
 var laser = new Image(); 
@@ -136,6 +139,16 @@ function mouseUp(e){
 function mousemove(e){
     clickX = e.clientX;
     clickY = e.clientY;
+}
+function touchS(e){
+    MOUSEDOWN = true;
+}
+function touchF(e){
+    MOUSEDOWN = false;
+}
+function touchM(e){
+    clickX = e.targetTouches[0].pageX;
+    clickY = e.targetTouches[0].pageY;
 }
 function keyDownHandler(e){
     if(e.keyCode == 38){
