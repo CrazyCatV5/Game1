@@ -15,7 +15,7 @@ var UP=false;
 var DOWN=false;
 var LEFT=false;
 var RIGHT=false;
-var MOUSEUP=false;
+var SPACE=false;
 var MOUSEDOWN=false;
 var time = 0;
 var bullets = [];
@@ -24,11 +24,17 @@ var control = 0;
 var shipSpeed = 20;
 var clickX = 0;
 var clickY = 0;
+var BulletSpeed = 20;
+var laserW = 499/5;
+var laserH = 125/5;
+var reload = 0;
 document.addEventListener("keydown",keyDownHandler, false);
 document.addEventListener("keyup",keyUpHandler, false);
 document.addEventListener("mousedown", mouseDown, false);
 document.addEventListener("mouseup", mouseUp, false);
 document.addEventListener("mousemove", mousemove, false);
+var laser = new Image(); 
+laser.src = 'images/laser.png';
 class Player {
     constructor(a, b){
         this.lives = 3;
@@ -46,12 +52,16 @@ class Player {
 class Obstacle {}
 class Enemy {}
 class Bullet {
-    constructor(x, y){
+    constructor(x, y, z){
         this.px = x;
         this.py = y;
+        this.way = z;
     }
     draw(){
-        ctx.drawRect
+        ctx.beginPath();
+        ctx.drawImage(laser, this.px, this.py, laserW, laserH);
+        ctx.closePath();
+        this.px += BulletSpeed;
     }
 }
 var met = new Image(); 
@@ -90,6 +100,9 @@ function keyDownHandler(e){
     else if(e.keyCode == 39){
         RIGHT = true;
     }
+    else if(e.keyCode == 32){
+        SPACE = true;
+    }
 }
 function keyUpHandler(e){
     if(e.keyCode == 38){
@@ -103,6 +116,9 @@ function keyUpHandler(e){
     }
     else if(e.keyCode == 39){
         RIGHT = false;
+    }
+    else if(e.keyCode == 32){
+        SPACE = false;
     }
 }
 function drawLives(){
@@ -172,6 +188,7 @@ function draw() {
         drawBall();
         drawShip();
         drawLives();
+        bullets.forEach(Bullet => {Bullet.draw()});
         if (x+dx < 0 || x+dx > canvas.width-80){
             dx = -dx;
         }
@@ -191,13 +208,18 @@ function draw() {
             if(LEFT && shipX > 0){
                 shipX -= shipSpeed;
             }
-            if (shipX < x + 768/60  && shipX + shipW  > x &&
-		        shipY < y + 829/60 && shipY + shipH > y && time > 50) {
+            if (shipX < x + 768/60  && shipX + shipW  > x 
+                && shipY < y + 829/60 && shipY + shipH > y && time > 50) {
                 Gamer.damag();
                 dx = -dx;
                 dy = -dy;
                 time = 0;
             }
+            if(SPACE && reload>10){
+                bullets.push(new Bullet(shipX + shipW, shipY + shipH/2, 1))
+                reload = 0;
+            }
+            reload+=1;
         }
         else {
             if (MOUSEDOWN){
@@ -208,13 +230,18 @@ function draw() {
                     shipX = clickX - shipW/2;
                 }
             }
-            if (shipX < x + 768/60  && shipX + shipW  > x &&
-		        shipY < y + 829/60 && shipY + shipH > y && time > 50) {
+            if (shipX < x + 768/60  && shipX + shipW  > x
+                && shipY < y + 829/60 && shipY + shipH > y && time > 50) {
                 Gamer.damag();
                 dx = -dx;
                 dy = -dy;
                 time = 0;
             }
+            if(reload>10){
+                bullets.push(new Bullet(shipX + shipW, shipY + shipH/2, 1))
+                reload = 0;
+            }
+            reload+=1;
         }
         time+=1;
     }
