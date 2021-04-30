@@ -37,6 +37,8 @@ var BossH = 700;
 var BossTime=0;
 var score = 0;
 var bestscore = 0; 
+var restart = false;
+var finalscore = 0;
 document.addEventListener("keydown",keyDownHandler, false);
 document.addEventListener("keyup",keyUpHandler, false);
 document.addEventListener("mousedown", mouseDown, false);
@@ -263,11 +265,11 @@ function drawShip() {
     ctx.closePath();
 }
 function drawMenu(){
+    score = 0;
     ctx.beginPath();
     ctx.drawImage(menus, 0, 0, canvas.width, canvas.height);
     ctx.closePath();
     ctx.beginPath();
-    ctx.imageSmoothingEnabled = false;
     ctx.font='100px sans-serif';
     ctx.fillStyle='#00ff60';
     ctx.strokeStyle='#000';
@@ -284,6 +286,13 @@ function drawMenu(){
     ctx.lineWidth = 2;
     ctx.strokeRect(canvas.width/2+canvas.width/10, canvas.height/2 - canvas.height/10, canvas.width/2 - canvas.width/4, canvas.height/2 - canvas.height/3);
     ctx.closePath();
+    ctx.beginPath();
+    ctx.font='100px sans-serif';
+    ctx.fillStyle='#00ff60';
+    ctx.strokeStyle='#000';
+    ctx.fillText("Best score " + bestscore.toString(), canvas.width/2-canvas.width/7 , canvas.height/2+canvas.height/3, 800);
+    ctx.strokeText("Best score " + bestscore.toString(), canvas.width/2-canvas.width/7, canvas.height/2+canvas.height/3, 800);
+    ctx.closePath();
     if(MOUSEDOWN && clickX>canvas.width/2+canvas.width/10 && clickX < canvas.width/2 + canvas.width/3
         && clickY > canvas.height/2 - canvas.height/10 && clickY < canvas.height/2 + canvas.height/10){
             menu = false;
@@ -293,6 +302,38 @@ function drawMenu(){
         && clickY > canvas.height/2 - canvas.height/10 && clickY < canvas.height/2 + canvas.height/10){
             menu = false;
             control = 0;
+    }
+}
+function drawRestart(){
+    ctx.beginPath();
+    ctx.drawImage(menus, 0, 0, canvas.width, canvas.height);
+    ctx.closePath();
+    ctx.beginPath();
+    ctx.font='100px sans-serif';
+    ctx.fillStyle='#00ff60';
+    ctx.strokeStyle='#000';
+    ctx.fillText("Restart", canvas.width/2-canvas.width/10 , canvas.height/2, 800);
+    ctx.strokeText("Restart", canvas.width/2-canvas.width/10, canvas.height/2, 800);
+    ctx.closePath();
+    ctx.beginPath();
+    ctx.font='100px sans-serif';
+    ctx.fillStyle='#00ff60';
+    ctx.strokeStyle='#000';
+    ctx.fillText("Your score " + finalscore.toString(), canvas.width/2-canvas.width/7 , canvas.height/2+canvas.height/5, 800);
+    ctx.strokeText("Your score " + finalscore.toString(), canvas.width/2-canvas.width/7, canvas.height/2+canvas.height/5, 800);
+    ctx.closePath();
+    ctx.beginPath();
+    ctx.font='100px sans-serif';
+    ctx.fillStyle='#00ff60';
+    ctx.strokeStyle='#000';
+    ctx.fillText("Best score " + bestscore.toString(), canvas.width/2-canvas.width/7 , canvas.height/2+canvas.height/3, 800);
+    ctx.strokeText("Best score " + bestscore.toString(), canvas.width/2-canvas.width/7, canvas.height/2+canvas.height/3, 800);
+    ctx.closePath();
+    if(MOUSEDOWN && clickX>canvas.width/2-canvas.width/10 && clickX < canvas.width/2 + canvas.width/3
+        && clickY > canvas.height/2 - canvas.height/10 && clickY < canvas.height/2 + canvas.height/10){
+            restart = false;
+            menu = true;
+            control = 1;
     }
 }
 function draw() {
@@ -397,17 +438,29 @@ function draw() {
             score += 1
         }
     }
-    if(menu == true){
+    if(menu){
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawMenu();
     }
+    if(restart){
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawRestart();
+    }
     if (Gamer.live == 0){
-        menu = true;
+        restart = true;
         Gamer.reset();
         shipH = 788/5;
         shipW = 818/5;
         shipX = 20;
         shipY = canvas.height/2;
+        BossTime = 0;
+        finalscore = score;
+        if (finalscore>bestscore){
+            bestscore = finalscore;
+        }
+        time = 0;
+        obstacles = [];
+        bosses = [];
     }
 }
 
