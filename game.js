@@ -7,8 +7,8 @@ var x = canvas.width/2;
 var y = canvas.height/2;
 var dx = 10;
 var dy = -10;
-var shipH = 788/5;
-var shipW = 818/5;
+var shipH = 788/(1/canvas.height*4000);
+var shipW = 818/(1/canvas.width*8000);
 var shipX = 20;
 var shipY = y;
 var UP=false;
@@ -28,13 +28,13 @@ var shipSpeed = 20;
 var clickX = 0;
 var clickY = 0;
 var BulletSpeed = 20;
-var laserW = 499/5;
-var laserH = 125/5;
+var laserW = 499/(1/canvas.width*8000);;
+var laserH = 125/(1/canvas.height*4000);;
 var reload = 0;
 var warspeed = 10;
 var bossspeed = 1;
-var BossW = 900;
-var BossH = 700;
+var BossW = 900/(1/canvas.height*800);;
+var BossH = 700/(1/canvas.height*1000);;
 var BossTime=0;
 var score = 0;
 var bestscore = 0; 
@@ -81,7 +81,7 @@ class Obstacle {
     }
     draw(){
         ctx.beginPath();
-        ctx.drawImage(met, this.x, this.y, 768/10, 829/10);
+        ctx.drawImage(met, this.x, this.y, 768/(1/canvas.width*16000), 829/(1/canvas.height*8000));
         ctx.closePath();
         this.x += this.dx;
         this.y += this.dy;
@@ -104,7 +104,7 @@ class Enemy {
     }
     draw(){
         ctx.beginPath();
-        ctx.drawImage(war, this.x, this.y, 646/5, 560/5);
+        ctx.drawImage(war, this.x, this.y, 646/(1/canvas.width*8000), 560/(1/canvas.height*4000));
         ctx.closePath();
         this.x -= warspeed;
     }
@@ -267,8 +267,8 @@ function drawScore(){
     ctx.font='100px sans-serif';
     ctx.fillStyle='#f24343';
     ctx.strokeStyle='#FFF';
-    ctx.fillText(health, canvas.height*2-canvas.height/3, canvas.width/20, 800);
-    ctx.strokeText(health, canvas.height*2-canvas.height/3, canvas.width/20, 800);
+    ctx.fillText(health, canvas.width*0.9, canvas.height/8, canvas.width/15);
+    ctx.strokeText(health, canvas.width*0.9, canvas.height/8, canvas.width/15);
     ctx.closePath();
 }
 function drawLives(){
@@ -276,8 +276,8 @@ function drawLives(){
     ctx.font='100px sans-serif';
     ctx.fillStyle='#f24343';
     ctx.strokeStyle='#FFF';
-    ctx.fillText(lives, canvas.height/20, canvas.width/20, 800);
-    ctx.strokeText(lives, canvas.height/20, canvas.width/20, 800);
+    ctx.fillText(lives, canvas.width*0.05, canvas.height/8, canvas.width/15);
+    ctx.strokeText(lives, canvas.width*0.05, canvas.height/8, canvas.width/15);
     ctx.closePath();
 }
 function drawShip() {
@@ -299,8 +299,8 @@ function drawMenu(){
     ctx.font='100px sans-serif';
     ctx.fillStyle='#00ff60';
     ctx.strokeStyle='#000';
-    ctx.fillText("Menu", canvas.width/2 - canvas.width/20 , 100, 800);
-    ctx.strokeText("Menu", canvas.width/2 - canvas.width/20 , 100, 800);
+    ctx.fillText("Menu", canvas.width/2 - canvas.width/20 , 100, canvas.width/10);
+    ctx.strokeText("Menu", canvas.width/2 - canvas.width/20 , 100, canvas.width/10);
     ctx.closePath();
     ctx.beginPath();
     ctx.drawImage(touch, canvas.width/2 - canvas.width/4, canvas.height/2 - canvas.height/10, canvas.width/2 - canvas.width/3, canvas.height/2 - canvas.height/3);
@@ -316,8 +316,8 @@ function drawMenu(){
     ctx.font='100px sans-serif';
     ctx.fillStyle='#00ff60';
     ctx.strokeStyle='#000';
-    ctx.fillText("Best score " + bestscore.toString(), canvas.width/2-canvas.width/7 , canvas.height/2+canvas.height/3, 800);
-    ctx.strokeText("Best score " + bestscore.toString(), canvas.width/2-canvas.width/7, canvas.height/2+canvas.height/3, 800);
+    ctx.fillText("Best score " + bestscore.toString(), canvas.width/2-canvas.width/7 , canvas.height/2+canvas.height/3, canvas.width/4);
+    ctx.strokeText("Best score " + bestscore.toString(), canvas.width/2-canvas.width/7, canvas.height/2+canvas.height/3, canvas.width/4);
     ctx.closePath();
     if(MOUSEDOWN && clickX>canvas.width/2+canvas.width/10 && clickX < canvas.width/2 + canvas.width/3
         && clickY > canvas.height/2 - canvas.height/10 && clickY < canvas.height/2 + canvas.height/10){
@@ -338,22 +338,22 @@ function drawRestart(){
     ctx.font='100px sans-serif';
     ctx.fillStyle='#00ff60';
     ctx.strokeStyle='#000';
-    ctx.fillText("Restart", canvas.width/2-canvas.width/10 , canvas.height/2, 800);
-    ctx.strokeText("Restart", canvas.width/2-canvas.width/10, canvas.height/2, 800);
+    ctx.fillText("Restart", canvas.width/2-canvas.width/10 , canvas.height/2, canvas.width/5);
+    ctx.strokeText("Restart", canvas.width/2-canvas.width/10, canvas.height/2, canvas.width/5);
     ctx.closePath();
     ctx.beginPath();
     ctx.font='100px sans-serif';
     ctx.fillStyle='#00ff60';
     ctx.strokeStyle='#000';
-    ctx.fillText("Your score " + finalscore.toString(), canvas.width/2-canvas.width/7 , canvas.height/2+canvas.height/5, 800);
-    ctx.strokeText("Your score " + finalscore.toString(), canvas.width/2-canvas.width/7, canvas.height/2+canvas.height/5, 800);
+    ctx.fillText("Your score " + finalscore.toString(), canvas.width/2-canvas.width/7 , canvas.height*0.7, canvas.width/4);
+    ctx.strokeText("Your score " + finalscore.toString(), canvas.width/2-canvas.width/7, canvas.height*0.7, canvas.width/4);
     ctx.closePath();
     ctx.beginPath();
     ctx.font='100px sans-serif';
     ctx.fillStyle='#00ff60';
     ctx.strokeStyle='#000';
-    ctx.fillText("Best score " + bestscore.toString(), canvas.width/2-canvas.width/7 , canvas.height/2+canvas.height/3, 800);
-    ctx.strokeText("Best score " + bestscore.toString(), canvas.width/2-canvas.width/7, canvas.height/2+canvas.height/3, 800);
+    ctx.fillText("Best score " + bestscore.toString(), canvas.width/2-canvas.width/7 , canvas.height*0.9, canvas.width/4);
+    ctx.strokeText("Best score " + bestscore.toString(), canvas.width/2-canvas.width/7, canvas.height*0.9, canvas.width/4);
     ctx.closePath();
     if(MOUSEDOWN && clickX>canvas.width/2-canvas.width/10 && clickX < canvas.width/2 + canvas.width/3
         && clickY > canvas.height/2 - canvas.height/10 && clickY < canvas.height/2 + canvas.height/10){
@@ -363,7 +363,7 @@ function drawRestart(){
     }
 }
 function draw() {
-    if (menu == false){
+    if (menu == false && restart == false){
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawBack();
         drawShip();
@@ -484,10 +484,12 @@ function draw() {
         drawRestart();
     }
     if (Gamer.live <= 0){
+        obstacles.splice(0,obstacles.length);
+        bosses.splice(0,bosses.length);
         restart = true;
         Gamer.reset();
-        shipH = 788/5;
-        shipW = 818/5;
+        shipH = 788/(1/canvas.height*4000);
+        shipW = 818/(1/canvas.width*8000);
         shipX = 20;
         shipY = canvas.height/2;
         BossTime = 0;
@@ -496,8 +498,6 @@ function draw() {
             bestscore = finalscore;
         }
         time = 0;
-        obstacles = [];
-        bosses = [];
     }
 }
 
