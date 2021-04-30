@@ -36,6 +36,9 @@ class Player {
     get live(){
         return this.lives;
     }
+    reset(){
+        this.lives = 3;
+    }
     damag(){
         this.lives-=1;
     }
@@ -215,11 +218,18 @@ function draw() {
         }
         time+=1;
     }
-    else if(menu == true){
+    if(menu == true){
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawMenu();
     }
-
+    if (Gamer.live == 0){
+        menu = true;
+        Gamer.reset();
+        shipH = 788/5;
+        shipW = 818/5;
+        shipX = 20;
+        shipY = canvas.height/2;
+    }
 }
 
 setInterval(draw, 30);
