@@ -1,21 +1,34 @@
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight - window.innerHeight/75;
 var ballRadius = 10;
 var x = canvas.width/2;
 var y = canvas.height/2;
-var dx = 2;
-var dy = -2;
-var shipH = 904/30;
-var shipW = 862/30;
+var dx = 10;
+var dy = -10;
+var shipH = 788/5;
+var shipW = 818/5;
 var shipX = 20;
 var shipY = y;
 var UP=false;
 var DOWN=false;
 var LEFT=false;
 var RIGHT=false;
+var MOUSEUP=false;
+var MOUSEDOWN=false;
 var time = 0;
+var bullets = [];
+var menu = true;
+var control = 0;
+var shipSpeed = 20;
+var clickX = 0;
+var clickY = 0;
 document.addEventListener("keydown",keyDownHandler, false);
 document.addEventListener("keyup",keyUpHandler, false);
+document.addEventListener("mousedown", mouseDown, false);
+document.addEventListener("mouseup", mouseUp, false);
+document.addEventListener("mousemove", mousemove, false);
 class Player {
     constructor(a, b){
         this.lives = 3;
@@ -29,15 +42,38 @@ class Player {
 }
 class Obstacle {}
 class Enemy {}
-class Bullet {}
+class Bullet {
+    constructor(x, y){
+        this.px = x;
+        this.py = y;
+    }
+    draw(){
+        ctx.drawRect
+    }
+}
 var met = new Image(); 
-met.src = 'images/kisspng-asteroid-sprite-clip-art-5afc5b72af87c6.282203891526487922719.png';
+met.src = 'images/oster.png';
+var menus = new Image(); 
+menus.src = 'images/Sss.webp';
+var touch = new Image(); 
+touch.src = 'images/touch.png';
+var keyboard = new Image(); 
+keyboard.src = 'images/Keyboard.png';
 var ship = new Image(); 
 ship.src = 'images/alienshiptex.png';
 var shipDamag = new Image(); 
 shipDamag.src = 'images/alienshiptex (2).png';
 var Gamer = new Player();
-
+function mouseDown(e){
+    MOUSEDOWN = true;
+}
+function mouseUp(e){
+    MOUSEDOWN = false;
+}
+function mousemove(e){
+    clickX = e.clientX;
+    clickY = e.clientY;
+}
 function keyDownHandler(e){
     if(e.keyCode == 38){
         UP = true;
@@ -70,16 +106,16 @@ function drawLives(){
     ctx.beginPath();
     var health = toString(3)
     var lives = Gamer.live.toString().concat(" ", "lives");
-    ctx.font='10px sans-serif';
+    ctx.font='100px sans-serif';
     ctx.fillStyle='#f24343';
     ctx.strokeStyle='#FFF';
-    ctx.fillText(lives, 10 , 10, 80);
-    ctx.strokeText(lives, 10 , 10, 80);
+    ctx.fillText(lives, 100 , 100, 800);
+    ctx.strokeText(lives, 100 , 100, 800);
     ctx.closePath();
 }
 function drawBall() {
     ctx.beginPath();
-    ctx.drawImage(met, x, y, 768/60, 829/60)
+    ctx.drawImage(met, x, y, 768/10, 829/10)
     ctx.closePath();
     x += dx;
     y += dy;
@@ -94,38 +130,96 @@ function drawShip() {
     }
     ctx.closePath();
 }
+function drawMenu(){
+    ctx.beginPath();
+    ctx.drawImage(menus, 0, 0, canvas.width, canvas.height);
+    ctx.closePath();
+    ctx.beginPath();
+    ctx.imageSmoothingEnabled = false;
+    ctx.font='100px sans-serif';
+    ctx.fillStyle='#00ff60';
+    ctx.strokeStyle='#000';
+    ctx.fillText("Menu", canvas.width/2 - canvas.width/20 , 100, 800);
+    ctx.strokeText("Menu", canvas.width/2 - canvas.width/20 , 100, 800);
+    ctx.closePath();
+    ctx.beginPath();
+    ctx.drawImage(touch, canvas.width/2 - canvas.width/4, canvas.height/2 - canvas.height/10, canvas.width/2 - canvas.width/3, canvas.height/2 - canvas.height/3);
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(canvas.width/2 - canvas.width/4, canvas.height/2 - canvas.height/10, canvas.width/2 - canvas.width/3, canvas.height/2 - canvas.height/3);
+    ctx.drawImage(keyboard, canvas.width/2+canvas.width/10, canvas.height/2 - canvas.height/10, canvas.width/2- canvas.width/4, canvas.height/2 - canvas.height/3);
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(canvas.width/2+canvas.width/10, canvas.height/2 - canvas.height/10, canvas.width/2 - canvas.width/4, canvas.height/2 - canvas.height/3);
+    ctx.closePath();
+    if(MOUSEDOWN && clickX>canvas.width/2+canvas.width/10 && clickX < canvas.width/2 + canvas.width/3
+        && clickY > canvas.height/2 - canvas.height/10 && clickY < canvas.height/2 + canvas.height/10){
+            menu = false;
+            control = 1;
+    }
+    if(MOUSEDOWN && clickX>canvas.width/2 - canvas.width/4 && clickX < canvas.width/2 - canvas.width/10
+        && clickY > canvas.height/2 - canvas.height/10 && clickY < canvas.height/2 + canvas.height/10){
+            menu = false;
+            control = 0;
+    }
+}
 function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawBall();
-    drawShip();
-    drawLives();
-    if (x+dx < 0 || x+dx > canvas.width-15){
-        dx = -dx;
+    if (menu == false){
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawBall();
+        drawShip();
+        drawLives();
+        if (x+dx < 0 || x+dx > canvas.width-80){
+            dx = -dx;
+        }
+        if (y+dy < 0||y+dy>canvas.height-80){
+            dy=-dy
+        }
+        if(control == 1){
+            if(UP && shipY >0){
+                shipY -= shipSpeed;
+            }
+            if(DOWN && shipY < canvas.height - shipH-20){
+                shipY += shipSpeed;
+            }
+            if(RIGHT && shipX <canvas.width - shipW-20){
+                shipX += shipSpeed;
+            }
+            if(LEFT && shipX > 0){
+                shipX -= shipSpeed;
+            }
+            if (shipX < x + 768/60  && shipX + shipW  > x &&
+		        shipY < y + 829/60 && shipY + shipH > y && time > 50) {
+                Gamer.damag();
+                dx = -dx;
+                dy = -dy;
+                time = 0;
+            }
+        }
+        else {
+            if (MOUSEDOWN){
+                if(clickY>0 && clickY < canvas.height - shipH-20){
+                    shipY = clickY - shipH/2;
+                }
+                if(clickX>0 && clickX < canvas.width - shipW-20){
+                    shipX = clickX - shipW/2;
+                }
+            }
+            if (shipX < x + 768/60  && shipX + shipW  > x &&
+		        shipY < y + 829/60 && shipY + shipH > y && time > 50) {
+                Gamer.damag();
+                dx = -dx;
+                dy = -dy;
+                time = 0;
+            }
+        }
+        time+=1;
     }
-    if (y+dy < 0||y+dy>canvas.height-15){
-        dy=-dy
+    else if(menu == true){
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawMenu();
     }
-    
-    if(UP && shipY >0){
-        shipY -= 5;
-    }
-    if(DOWN && shipY < canvas.height - shipH){
-        shipY += 5;
-    }
-    if(RIGHT && shipX <canvas.width - shipW*2){
-        shipX += 5;
-    }
-    if(LEFT && shipX > 0){
-        shipX -= 5;
-    }
-    if (shipX < x + 768/60  && shipX + shipW  > x &&
-		shipY < y + 829/60 && shipY + shipH > y && time > 50) {
-        Gamer.damag();
-        dx = -dx;
-        dy = -dy;
-        time = 0;
-    }
-    time+=1;
+
 }
 
 setInterval(draw, 30);
