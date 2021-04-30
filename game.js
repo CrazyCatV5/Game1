@@ -20,7 +20,7 @@ var MOUSEDOWN=false;
 var time = 0;
 var bullets = [];
 var obstacles = [];
-var enemies = [];
+var bosses = [];
 var menu = true;
 var control = 0;
 var shipSpeed = 20;
@@ -31,6 +31,10 @@ var laserW = 499/5;
 var laserH = 125/5;
 var reload = 0;
 var warspeed = 10;
+var bossspeed = 1;
+var BossW = 900;
+var BossH = 700;
+var BossTime=0;
 document.addEventListener("keydown",keyDownHandler, false);
 document.addEventListener("keyup",keyUpHandler, false);
 document.addEventListener("mousedown", mouseDown, false);
@@ -41,6 +45,8 @@ document.addEventListener("touchmove", touchM, false);
 document.addEventListener("touchcancel", touchF, false);
 var back = new Image(); 
 back.src = 'images/mlechnyy-put-kosmos-zvezdy-3734.jpg';
+var BossIm = new Image(); 
+BossIm.src = 'images/starshippixelart.png';
 var laser = new Image(); 
 laser.src = 'images/laser.png';
 var war = new Image(); 
@@ -101,6 +107,42 @@ class Enemy {
                 return true;
             }
         return false;
+    }
+}
+class Boss {
+    constructor(){
+        this.x = canvas.width;
+        this.y = canvas.height/5;
+        this.healthes = 50
+    }
+    draw(){
+        ctx.beginPath();
+        ctx.drawImage(BossIm, this.x, this.y, BossW, BossH);
+        ctx.closePath();
+        if (this.x>canvas.width-canvas.width/5){
+            this.x -= bossspeed;
+        }
+        ctx.beginPath();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(canvas.width/2 - canvas.width/5, canvas.height/25, canvas.width/2 + canvas.width/10, canvas.height/25 + canvas.height/320);
+        ctx.closePath();
+        ctx.beginPath();
+        ctx.fillRect(canvas.width/2 - canvas.width/5, canvas.height/25, canvas.width/2 + canvas.width/10 - (50-this.healthes)*(canvas.width/2 + canvas.width/10)/50, canvas.height/25 + canvas.height/320,"red");
+        ctx.closePath();
+    }
+    damag(){
+        if (shipX < this.x + BossW  && shipX + shipW  > this.x
+            && shipY < this.y + BossH && shipY + shipH > this.y && time > 50){
+                return true;
+            }
+        return false;
+    }
+    getdamag(){
+        this.healthes -=1;
+    }
+    get healthget(){
+        return this.healthes;
     }
 }
 class Bullet {
@@ -250,12 +292,29 @@ function draw() {
         drawBack();
         drawShip();
         drawLives();
+        if(BossTime==100){
+            bosses.push(new Boss());
+        }
+        bosses.forEach((Boss, index) => {
+            Boss.draw();
+            if(Boss.healthget == 0){
+                bosses.splice(index,1); 
+            }   
+        });
+        BossTime+=1;
         bullets.forEach((Bullet, index) => {
             Bullet.draw()
             obstacles.forEach((Obstacle, indexO) =>{
                 if (Bullet.px < Obstacle.x + 768/10  && Bullet.px + laserW  > Obstacle.x
                     && Bullet.py/1.2 < Obstacle.y + 829/60 && Bullet.py + laserH > Obstacle.y){
                         obstacles.splice(indexO,1);
+                        bullets.splice(index, 1);
+                    }
+            })
+            bosses.forEach((Boss, indexO) =>{
+                if (Bullet.px < Boss.x + BossW  && Bullet.px + laserW  > Boss.x
+                    && Bullet.py/1.2 < Boss.y + BossH && Bullet.py + laserH > Boss.y){
+                        Boss.getdamag();
                         bullets.splice(index, 1);
                     }
             })
@@ -309,13 +368,6 @@ function draw() {
                 if(clickX>0 && clickX < canvas.width - shipW-20){
                     shipX = clickX - shipW/2;
                 }
-            }
-            if (shipX < x + 768/60  && shipX + shipW  > x
-                && shipY < y + 829/60 && shipY + shipH > y && time > 50) {
-                Gamer.damag();
-                dx = -dx;
-                dy = -dy;
-                time = 0;
             }
             if(reload>10){
                 bullets.push(new Bullet(shipX + shipW, shipY + shipH/2, 1))
