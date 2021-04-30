@@ -1,7 +1,7 @@
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
-canvas.height = window.innerHeight - window.innerHeight/75;
+canvas.height = window.innerHeight - window.innerHeight/40;
 var ballRadius = 10;
 var x = canvas.width/2;
 var y = canvas.height/2;
@@ -362,6 +362,7 @@ function drawRestart(){
             control = 1;
     }
 }
+var music = 0;
 function draw() {
     if (menu == false && restart == false){
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -500,5 +501,4 @@ function draw() {
         time = 0;
     }
 }
-
 setInterval(draw, 30);
