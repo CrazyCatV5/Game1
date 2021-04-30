@@ -1,11 +1,10 @@
 body {
     font-style: oblique;
     font-family: 'Courier New', Courier, monospace;
-    background-image: url(../images/sky.jpg);
+    background-image: url(../images/sky.png);
 }
 canvas{
-    background-image: url(../images/sky.jpg);
+    background-image: url(../images/sky.png);
     width: 100%;
     height: 100%;
-    background-image: url(../images/sky.jpg);
 }

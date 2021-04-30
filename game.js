@@ -19,6 +19,7 @@ var SPACE=false;
 var MOUSEDOWN=false;
 var time = 0;
 var bullets = [];
+var obstacles = [];
 var menu = true;
 var control = 0;
 var shipSpeed = 20;
@@ -49,7 +50,31 @@ class Player {
         this.lives-=1;
     }
 }
-class Obstacle {}
+class Obstacle {
+    constructor(x,y,dx,dy){
+        this.x = x;
+        this.y = y;
+        this.dx =dx;
+        this.dy = dy;
+    }
+    draw(){
+        ctx.beginPath();
+        ctx.drawImage(met, this.x, this.y, 768/10, 829/10);
+        ctx.closePath();
+        this.x += this.dx;
+        this.y += this.dy;
+        if (this.y+this.dy < 0||this.y+this.dy>canvas.height-80){
+            this.dy=-this.dy;
+        }
+    }
+    damag(){
+        if (shipX < this.x + 768/60  && shipX + shipW  > this.x
+            && shipY < this.y + 829/60 && shipY + shipH > this.y && time > 50){
+                return true;
+            }
+        return false;
+    }
+}
 class Enemy {}
 class Bullet {
     constructor(x, y, z){
@@ -132,13 +157,6 @@ function drawLives(){
     ctx.strokeText(lives, 100 , 100, 800);
     ctx.closePath();
 }
-function drawBall() {
-    ctx.beginPath();
-    ctx.drawImage(met, x, y, 768/10, 829/10)
-    ctx.closePath();
-    x += dx;
-    y += dy;
-}
 function drawShip() {
     ctx.beginPath();
     if (time > 50){
@@ -185,10 +203,31 @@ function drawMenu(){
 function draw() {
     if (menu == false){
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        drawBall();
         drawShip();
         drawLives();
-        bullets.forEach(Bullet => {Bullet.draw()});
+        bullets.forEach((Bullet, index) => {
+            Bullet.draw()
+            obstacles.forEach((Obstacle, indexO) =>{
+                if (Bullet.px < Obstacle.x + 768/10  && Bullet.px + laserW  > Obstacle.x
+                    && Bullet.py/1.15 < Obstacle.y + 829/60 && Bullet.py + laserH > Obstacle.y){
+                        obstacles.splice(indexO,1);
+                        bullets.splice(index, 1);
+                    }
+            })
+        });
+        obstacles.forEach((Obstacle, index) => {
+
+            if(Obstacle.damag()){
+                Gamer.damag();
+                obstacles.splice(index,1);
+                time = 0;
+            }
+
+        });
+        obstacles.forEach(Obstacle => {Obstacle.draw()});
+        if(Math.floor(Math.random() * 1000)<15){
+            obstacles.push(new Obstacle( canvas.width, Math.floor(Math.random() * canvas.height/3)+canvas.height/4, -10, (Math.floor(Math.random() * 3)-2)*10))
+        }
         if (x+dx < 0 || x+dx > canvas.width-80){
             dx = -dx;
         }
@@ -207,13 +246,6 @@ function draw() {
             }
             if(LEFT && shipX > 0){
                 shipX -= shipSpeed;
-            }
-            if (shipX < x + 768/60  && shipX + shipW  > x 
-                && shipY < y + 829/60 && shipY + shipH > y && time > 50) {
-                Gamer.damag();
-                dx = -dx;
-                dy = -dy;
-                time = 0;
             }
             if(SPACE && reload>10){
                 bullets.push(new Bullet(shipX + shipW, shipY + shipH/2, 1))
