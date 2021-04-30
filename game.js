@@ -35,6 +35,8 @@ var bossspeed = 1;
 var BossW = 900;
 var BossH = 700;
 var BossTime=0;
+var score = 0;
+var bestscore = 0; 
 document.addEventListener("keydown",keyDownHandler, false);
 document.addEventListener("keyup",keyUpHandler, false);
 document.addEventListener("mousedown", mouseDown, false);
@@ -113,7 +115,7 @@ class Boss {
     constructor(){
         this.x = canvas.width;
         this.y = canvas.height/5;
-        this.healthes = 50
+        this.healthes = 100;
     }
     draw(){
         ctx.beginPath();
@@ -125,10 +127,10 @@ class Boss {
         ctx.beginPath();
         ctx.strokeStyle = '#fff';
         ctx.lineWidth = 2;
-        ctx.strokeRect(canvas.width/2 - canvas.width/5, canvas.height/25, canvas.width/2 + canvas.width/10, canvas.height/25 + canvas.height/320);
+        ctx.strokeRect(canvas.width/2 - canvas.width/4, canvas.height/25, canvas.width/2 + canvas.width/100, canvas.height/25 + canvas.height/320);
         ctx.closePath();
         ctx.beginPath();
-        ctx.fillRect(canvas.width/2 - canvas.width/5, canvas.height/25, canvas.width/2 + canvas.width/10 - (50-this.healthes)*(canvas.width/2 + canvas.width/10)/50, canvas.height/25 + canvas.height/320,"red");
+        ctx.fillRect(canvas.width/2 - canvas.width/4, canvas.height/25, canvas.width/2 + canvas.width/100 - (100-this.healthes)*(canvas.width/2 + canvas.width/100)/100, canvas.height/25 + canvas.height/320,"red");
         ctx.closePath();
     }
     damag(){
@@ -231,16 +233,23 @@ function drawBack(){
     ctx.drawImage(back, 0, 0, canvas.width, canvas.height);
     ctx.closePath();
 }
-
-function drawLives(){
+function drawScore(){
     ctx.beginPath();
-    var health = toString(3)
+    var health = score.toString()
+    ctx.font='100px sans-serif';
+    ctx.fillStyle='#f24343';
+    ctx.strokeStyle='#FFF';
+    ctx.fillText(health, canvas.height*2-canvas.height/3, canvas.width/20, 800);
+    ctx.strokeText(health, canvas.height*2-canvas.height/3, canvas.width/20, 800);
+    ctx.closePath();
+}
+function drawLives(){
     var lives = Gamer.live.toString().concat(" ", "lives");
     ctx.font='100px sans-serif';
     ctx.fillStyle='#f24343';
     ctx.strokeStyle='#FFF';
-    ctx.fillText(lives, 100 , 100, 800);
-    ctx.strokeText(lives, 100 , 100, 800);
+    ctx.fillText(lives, canvas.height/20, canvas.width/20, 800);
+    ctx.strokeText(lives, canvas.height/20, canvas.width/20, 800);
     ctx.closePath();
 }
 function drawShip() {
@@ -292,13 +301,16 @@ function draw() {
         drawBack();
         drawShip();
         drawLives();
-        if(BossTime==100){
+        drawScore();
+        if(BossTime==1000){
             bosses.push(new Boss());
         }
         bosses.forEach((Boss, index) => {
             Boss.draw();
             if(Boss.healthget == 0){
                 bosses.splice(index,1); 
+                BossTime = 0;
+                score += 1000;
             }   
         });
         BossTime+=1;
@@ -309,6 +321,7 @@ function draw() {
                     && Bullet.py/1.2 < Obstacle.y + 829/60 && Bullet.py + laserH > Obstacle.y){
                         obstacles.splice(indexO,1);
                         bullets.splice(index, 1);
+                        score += 10;
                     }
             })
             bosses.forEach((Boss, indexO) =>{
@@ -320,13 +333,17 @@ function draw() {
             })
         });
         obstacles.forEach((Obstacle, index) => {
-
             if(Obstacle.damag()){
                 Gamer.damag();
                 obstacles.splice(index,1);
                 time = 0;
             }
-
+        });
+        bosses.forEach((Boss, index) => {
+            if(Boss.damag()){
+                Gamer.damag();
+                time = 0;
+            }
         });
         obstacles.forEach(Obstacle => {Obstacle.draw()});
         if(Math.floor(Math.random() * 1000)<15){
@@ -376,6 +393,9 @@ function draw() {
             reload+=1;
         }
         time+=1;
+        if(BossTime%10 == 0){
+            score += 1
+        }
     }
     if(menu == true){
         ctx.clearRect(0, 0, canvas.width, canvas.height);
