@@ -20,6 +20,7 @@ var MOUSEDOWN=false;
 var time = 0;
 var bullets = [];
 var obstacles = [];
+var enemies = [];
 var menu = true;
 var control = 0;
 var shipSpeed = 20;
@@ -29,13 +30,18 @@ var BulletSpeed = 20;
 var laserW = 499/5;
 var laserH = 125/5;
 var reload = 0;
+var warspeed = 10;
 document.addEventListener("keydown",keyDownHandler, false);
 document.addEventListener("keyup",keyUpHandler, false);
 document.addEventListener("mousedown", mouseDown, false);
 document.addEventListener("mouseup", mouseUp, false);
 document.addEventListener("mousemove", mousemove, false);
+var back = new Image(); 
+back.src = 'images/mlechnyy-put-kosmos-zvezdy-3734.jpg';
 var laser = new Image(); 
 laser.src = 'images/laser.png';
+var war = new Image(); 
+war.src = 'images/klipartz.com-1.png';
 class Player {
     constructor(a, b){
         this.lives = 3;
@@ -68,14 +74,32 @@ class Obstacle {
         }
     }
     damag(){
-        if (shipX < this.x + 768/60  && shipX + shipW  > this.x
-            && shipY < this.y + 829/60 && shipY + shipH > this.y && time > 50){
+        if (shipX < this.x + 768/10  && shipX + shipW  > this.x
+            && shipY < this.y + 829/10 && shipY + shipH > this.y && time > 50){
                 return true;
             }
         return false;
     }
 }
-class Enemy {}
+class Enemy {
+    constructor(x,y){
+        this.x = x;
+        this.y = y;
+    }
+    draw(){
+        ctx.beginPath();
+        ctx.drawImage(war, this.x, this.y, 646/5, 560/5);
+        ctx.closePath();
+        this.x -= warspeed;
+    }
+    damag(){
+        if (shipX < this.x + 646/10  && shipX + shipW  > this.x
+            && shipY < this.y + 560/10 && shipY + shipH > this.y && time > 50){
+                return true;
+            }
+        return false;
+    }
+}
 class Bullet {
     constructor(x, y, z){
         this.px = x;
@@ -88,6 +112,7 @@ class Bullet {
         ctx.closePath();
         this.px += BulletSpeed;
     }
+    
 }
 var met = new Image(); 
 met.src = 'images/oster.png';
@@ -146,6 +171,12 @@ function keyUpHandler(e){
         SPACE = false;
     }
 }
+function drawBack(){
+    ctx.beginPath();
+    ctx.drawImage(back, 0, 0, canvas.width, canvas.height);
+    ctx.closePath();
+}
+
 function drawLives(){
     ctx.beginPath();
     var health = toString(3)
@@ -203,13 +234,14 @@ function drawMenu(){
 function draw() {
     if (menu == false){
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawBack();
         drawShip();
         drawLives();
         bullets.forEach((Bullet, index) => {
             Bullet.draw()
             obstacles.forEach((Obstacle, indexO) =>{
                 if (Bullet.px < Obstacle.x + 768/10  && Bullet.px + laserW  > Obstacle.x
-                    && Bullet.py/1.15 < Obstacle.y + 829/60 && Bullet.py + laserH > Obstacle.y){
+                    && Bullet.py/1.2 < Obstacle.y + 829/60 && Bullet.py + laserH > Obstacle.y){
                         obstacles.splice(indexO,1);
                         bullets.splice(index, 1);
                     }
@@ -226,7 +258,10 @@ function draw() {
         });
         obstacles.forEach(Obstacle => {Obstacle.draw()});
         if(Math.floor(Math.random() * 1000)<15){
-            obstacles.push(new Obstacle( canvas.width, Math.floor(Math.random() * canvas.height/3)+canvas.height/4, -10, (Math.floor(Math.random() * 3)-2)*10))
+            obstacles.push(new Obstacle( canvas.width, Math.floor(Math.random() * canvas.height/3)+canvas.height/4, -(Math.floor(Math.random() * 30)), (Math.floor(Math.random() * 3)-2)*10))
+        }
+        if(Math.floor(Math.random() * 1000)<15){
+            obstacles.push(new Enemy( canvas.width, Math.floor(Math.random() * canvas.height/3)+canvas.height/4));
         }
         if (x+dx < 0 || x+dx > canvas.width-80){
             dx = -dx;
